@@ -30,7 +30,7 @@ $ cp .env.sample .env
 
 Compile(Debug flags: https://github.com/go-delve) all files, listed in Procfile:
 ```sh
-$ go build -gcflags="all=-N -l" -o bin/authenticate -v authcode/authenticate.go
+$ go build -gcflags="all=-N -l" -o bin/authcode -v authcode/authenticate.go
 $ go build -gcflags="all=-N -l" -o bin/spotify -v sṕotify.go
 $ go build -gcflags="all=-N -l" -o bin/spotifyauth -v auth/auth.go
 ```
