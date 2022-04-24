@@ -3,6 +3,8 @@ package spotifyauth
 import (
 	"context"
 	"errors"
+	"go-rec/helpers"
+	"log"
 	"net/http"
 	"os"
 
@@ -54,6 +56,13 @@ func WithRedirectURL(url string) AuthenticatorOption {
 }
 
 func New(opts ...AuthenticatorOption) *Authenticator {
+	env := helpers.VerifyEnv([]string{
+		"SPOTIFY_ID",
+		"SPOTIFY_SECRET",
+	})
+	if env != nil {
+		log.Fatal(env)
+	}
 	cfg := &oauth2.Config{
 		ClientID:     os.Getenv("SPOTIFY_ID"),
 		ClientSecret: os.Getenv("SPOTIFY_SECRET"),
