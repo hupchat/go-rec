@@ -20,7 +20,7 @@ import (
 var (
 	auth  = spotifyauth.New(spotifyauth.WithRedirectURL(redirectURI()), spotifyauth.WithScopes(spotifyauth.ScopeUserFollowRead, spotifyauth.ScopeUserLibraryModify))
 	ch    = make(chan *spotify.Client)
-	state = "cauazera123"
+	state = "go-rec-state"
 )
 
 func redirectURI() string {
