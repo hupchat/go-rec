@@ -1,1 +1,1 @@
-web: bin/authenticate
+web: bin/authcode
