@@ -64,7 +64,7 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go cache.SetHash(context.Background(), &wg, user.ID, "token", clientToken.AccessToken)
-	go cache.SetHash(context.Background(), &wg, user.ID, "refresh", clientToken.RefreshToken)
+	go cache.SetHash(context.Background(), &wg, user.ID, "refresh_token", clientToken.RefreshToken)
 	wg.Wait()
 }
 
