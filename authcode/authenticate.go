@@ -19,7 +19,6 @@ import (
 
 var (
 	auth  = spotifyauth.New(spotifyauth.WithRedirectURL(redirectURI()), spotifyauth.WithScopes(spotifyauth.ScopeUserFollowRead, spotifyauth.ScopeUserLibraryModify))
-	ch    = make(chan *spotify.Client)
 	state = "go-rec-state"
 )
 
@@ -46,32 +45,11 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Got request for:", r.URL.String())
 	})
-	go func() {
-		err := http.ListenAndServe(":"+port, nil)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
 
 	url := auth.AuthURL(state)
 	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
 
-	// wait for auth to complete
-	client := <-ch
-
-	// use the client to make calls that require authorization
-	user, err := client.CurrentUser(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("You are logged in as:", user.ID)
-	clientToken, _ := client.Token()
-
-	var wg sync.WaitGroup
-	wg.Add(2)
-	go cache.SetHash(context.Background(), &wg, user.ID, "token", clientToken.AccessToken)
-	go cache.SetHash(context.Background(), &wg, user.ID, "refresh_token", clientToken.RefreshToken)
-	wg.Wait()
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
 func completeAuth(w http.ResponseWriter, r *http.Request) {
@@ -88,5 +66,21 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	// use the token to get an authenticated client
 	client := spotify.New(auth.Client(r.Context(), tok))
 	fmt.Fprintf(w, "Login Completed!")
-	ch <- client
+
+	// use the client to make calls that require authorization
+	user, err := client.CurrentUser(r.Context())
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("You are logged in as:", user.ID)
+	createClientCache(r.Context(), client, user)
+}
+
+func createClientCache(ctx context.Context, client *spotify.Client, user *spotify.PrivateUser) {
+	clientToken, _ := client.Token()
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go cache.SetHash(ctx, &wg, user.ID, "token", clientToken.AccessToken)
+	go cache.SetHash(ctx, &wg, user.ID, "refresh_token", clientToken.RefreshToken)
+	wg.Wait()
 }
