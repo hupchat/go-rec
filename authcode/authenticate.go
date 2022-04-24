@@ -7,6 +7,7 @@ import (
 	spotifyauth "go-rec/auth"
 	"log"
 	"net/http"
+	"os"
 )
 
 // redirectURI is the OAuth redirect URI for the application.
@@ -21,13 +22,17 @@ var (
 )
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
 	// first start an HTTP server
 	http.HandleFunc("/callback", completeAuth)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Got request for:", r.URL.String())
 	})
 	go func() {
-		err := http.ListenAndServe(":8080", nil)
+		err := http.ListenAndServe(":"+port, nil)
 		if err != nil {
 			log.Fatal(err)
 		}

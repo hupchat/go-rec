@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:6-alpine
+    command: /bin/sh -c "sysctl vm.overcommit_memory=1 && redis-server --appendonly yes"
+    privileged: true
+    ports:
+      - "127.0.0.1:7379:6379"
+    volumes:
+      - redisData:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+volumes:
+  redisData:
