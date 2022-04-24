@@ -16,13 +16,19 @@ import (
 // redirectURI is the OAuth redirect URI for the application.
 // You must register an application at Spotify's developer portal
 // and enter this value.
-const redirectURI = "http://localhost:8080/callback"
 
 var (
-	auth  = spotifyauth.New(spotifyauth.WithRedirectURL(redirectURI), spotifyauth.WithScopes(spotifyauth.ScopeUserFollowRead, spotifyauth.ScopeUserLibraryModify))
+	auth  = spotifyauth.New(spotifyauth.WithRedirectURL(redirectURI()), spotifyauth.WithScopes(spotifyauth.ScopeUserFollowRead, spotifyauth.ScopeUserLibraryModify))
 	ch    = make(chan *spotify.Client)
 	state = "cauazera123"
 )
+
+func redirectURI() string {
+	if helpers.IsDev() {
+		return "http://localhost:" + os.Getenv("PORT") + "/callback"
+	}
+	return "https://" + os.Getenv("HEROKU_APP_NAME") + ".herokuapp.com/callback"
+}
 
 func main() {
 	env := helpers.VerifyEnv([]string{
