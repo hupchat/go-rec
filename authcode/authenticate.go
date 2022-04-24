@@ -27,7 +27,7 @@ func redirectURI() string {
 	if helpers.IsDev() {
 		return "http://localhost:" + os.Getenv("PORT") + "/callback"
 	}
-	return "https://" + os.Getenv("HEROKU_APP_NAME") + ".herokuapp.com/callback"
+	return "https://go-rec-app.herokuapp.com/callback"
 }
 
 func main() {
